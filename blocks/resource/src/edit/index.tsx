@@ -91,7 +91,7 @@ const ResourceForm: React.FC<ResourceFormProps> = props => {
         const response = await API.authorization.resource.detail.fetch({ id });
         const { parentId } = response.data;
         setValues({ ...response.data, parentId: parentId ? parentId : undefined });
-        setTypeValue(response.data.isVisible);
+        setTypeValue(response.data.type);
       } catch (error) {
         message.error(error.message);
       }
