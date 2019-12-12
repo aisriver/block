@@ -42,7 +42,7 @@ const descLayout = {
   },
 };
 
-interface ResourceFormProps extends PageBasicPropsModel, FormComponentProps {}
+interface ResourceFormProps extends PageBasicPropsModel, FormComponentProps { }
 
 const ResourceForm: React.FC<ResourceFormProps> = props => {
   const { getFieldDecorator } = props.form;
@@ -89,8 +89,7 @@ const ResourceForm: React.FC<ResourceFormProps> = props => {
     async (id: number) => {
       try {
         const response = await API.authorization.resource.detail.fetch({ id });
-        const { parentId } = response.data;
-        setValues({ ...response.data, parentId: parentId ? parentId : undefined });
+        setValues(response.data);
         setTypeValue(response.data.type);
       } catch (error) {
         message.error(error.message);
@@ -114,7 +113,8 @@ const ResourceForm: React.FC<ResourceFormProps> = props => {
     props.form.validateFields(async (err, values) => {
       if (!err) {
         try {
-          values = id ? { ...values, id } : values;
+          const { parentId } = values;
+          values = id ? { ...values, id, parentId: parentId || 0 } : { ...values, parentId: parentId || 0 };
           await API.authorization.resource.newResource.fetch({
             ...values,
             clientKey: ((window as unknown) as CustomWindow).authConfig.client_id,
@@ -156,14 +156,14 @@ const ResourceForm: React.FC<ResourceFormProps> = props => {
           <Col span={12}>
             <FormItem label="父级菜单">
               {getFieldDecorator('parentId', {
-                initialValue: values.parentId,
+                initialValue: values.parentId || undefined,
               })(<TreeSelect allowClear treeData={menu} />)}
             </FormItem>
           </Col>
           <Col span={12}>
             <FormItem label="资源顺位">
               {getFieldDecorator('orderValue', {
-                initialValue: values.orderValue,
+                initialValue: values.orderValue || undefined,
               })(<InputNumber min={1} style={{ width: '100%' }} />)}
             </FormItem>
           </Col>
